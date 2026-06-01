@@ -5,9 +5,9 @@ const auth = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ 
-                success: false, 
-                message: 'Accès refusé. Token manquant.' 
+            return res.status(401).json({
+                success: false,
+                message: 'Accès refusé. Token manquant.'
             });
         }
 
@@ -20,16 +20,16 @@ const auth = async (req, res, next) => {
         });
 
         if (!user) {
-            return res.status(401).json({ 
-                success: false, 
-                message: 'Utilisateur non trouvé.' 
+            return res.status(401).json({
+                success: false,
+                message: 'Utilisateur non trouvé.'
             });
         }
 
         if (!user.is_active) {
-            return res.status(403).json({ 
-                success: false, 
-                message: 'Compte désactivé.' 
+            return res.status(403).json({
+                success: false,
+                message: 'Compte désactivé.'
             });
         }
 
@@ -37,14 +37,14 @@ const auth = async (req, res, next) => {
         next();
     } catch (error) {
         if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({ 
-                success: false, 
-                message: 'Token expiré. Veuillez vous reconnecter.' 
+            return res.status(401).json({
+                success: false,
+                message: 'Token expiré. Veuillez vous reconnecter.'
             });
         }
-        return res.status(401).json({ 
-            success: false, 
-            message: 'Token invalide.' 
+        return res.status(401).json({
+            success: false,
+            message: 'Token invalide.'
         });
     }
 };

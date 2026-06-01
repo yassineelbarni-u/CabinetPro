@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, TrendingUp, AlertCircle, Calendar as CalendarIcon, Clock, ArrowRight } from 'lucide-react';
+import { Users, TrendingUp, AlertCircle, Calendar as CalendarIcon, Clock, ArrowRight, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import { formatCurrency, formatDateTime } from '../utils/formatters';

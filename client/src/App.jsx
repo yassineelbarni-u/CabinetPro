@@ -7,6 +7,9 @@ import PatientsPage from './pages/PatientsPage';
 import PatientDetailPage from './pages/PatientDetailPage';
 import SessionCreatePage from './pages/SessionCreatePage';
 import AppointmentsPage from './pages/AppointmentsPage';
+import PaymentsPage from './pages/PaymentsPage';
+import AccountingPage from './pages/AccountingPage';
+import SettingsPage from './pages/SettingsPage';
 
 import { LanguageProvider } from './context/LanguageContext';
 
@@ -47,9 +50,9 @@ function App() {
             <Route path="patients/:id" element={<PatientDetailPage />} />
             <Route path="patients/:patient_id/sessions/new" element={<SessionCreatePage />} />
             <Route path="appointments" element={<AppointmentsPage />} />
-            <Route path="payments" element={<div className="p-6"><h1 className="text-2xl font-bold">Paiements (En construction)</h1></div>} />
-            <Route path="accounting" element={<div className="p-6"><h1 className="text-2xl font-bold">Comptabilité (En construction)</h1></div>} />
-            <Route path="settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Paramètres (En construction)</h1></div>} />
+            <Route path="payments" element={<PaymentsPage />} />
+            <Route path="accounting" element={<AccountingPage />} />
+            <Route path="settings" element={<SettingsPage />} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" replace />} />
