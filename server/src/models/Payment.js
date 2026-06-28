@@ -40,6 +40,8 @@ const Payment = sequelize.define('payments', {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
     },
+}, {
+    updatedAt: false,
 });
 
 module.exports = Payment;

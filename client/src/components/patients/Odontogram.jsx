@@ -93,7 +93,7 @@ const getToothPosition = (index, isBottom, isLeft) => {
   return { left: x, top: y, rotation };
 };
 
-export default function Odontogram({ value, onChange }) {
+export default function Odontogram({ value, onChange, readOnly = false }) {
   const [selectedTooth, setSelectedTooth] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [treatment, setTreatment] = useState('sain');
@@ -105,6 +105,7 @@ export default function Odontogram({ value, onChange }) {
   };
 
   const handleToothClick = (num) => {
+    if (readOnly) return;
     const existing = getToothState(num);
     setSelectedTooth(num);
     setTreatment(existing.treatment_type);
@@ -160,7 +161,7 @@ export default function Odontogram({ value, onChange }) {
           <div
             key={toothNumber}
             onClick={() => handleToothClick(toothNumber)}
-            className="absolute flex flex-col items-center justify-center cursor-pointer group"
+            className={`absolute flex flex-col items-center justify-center group ${readOnly ? 'cursor-default' : 'cursor-pointer'}`}
             style={{
               left: `${left}px`,
               top: `${top}px`,
@@ -211,7 +212,7 @@ export default function Odontogram({ value, onChange }) {
     <div className="odontogram-container p-8 bg-white rounded-2xl border border-gray-100 shadow-sm">
       <div className="text-center mb-8">
         <h3 className="text-xl font-bold text-gray-800">Odontogramme (FDI)</h3>
-        <p className="text-sm text-gray-500 mt-1">Cliquez sur une dent pour interagir</p>
+        {!readOnly && <p className="text-sm text-gray-500 mt-1">Cliquez sur une dent pour interagir</p>}
       </div>
 
       <div className="flex flex-col items-center gap-2 bg-gradient-to-b from-blue-50/50 via-white to-blue-50/50 rounded-3xl p-6 overflow-hidden border border-gray-100 shadow-inner">

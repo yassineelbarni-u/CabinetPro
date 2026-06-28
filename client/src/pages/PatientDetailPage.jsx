@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import api from '../api/axios';
 import { formatDate, calculateAge, PATIENT_TYPE_LABELS } from '../utils/formatters';
+import Odontogram from '../components/patients/Odontogram';
 
 const PAYMENT_STATUS = {
   paid: { label: 'Payé', class: 'bg-emerald-100 text-emerald-700' },
@@ -89,7 +90,7 @@ export default function PatientDetailPage() {
         byTooth[record.tooth_number] = record;
       }
     });
-    return Object.values(byTooth).filter(t => t.treatment_type !== 'sain');
+    return Object.values(byTooth).filter(t => t.treatment_type !== 'sain' || parseFloat(t.price) > 0 || t.notes);
   };
 
   if (loading) return <div className="py-12 flex justify-center"><div className="spinner"></div></div>;
@@ -265,6 +266,18 @@ export default function PatientDetailPage() {
                         {session.clinical_notes}
                       </p>
                     )}
+                    {session.tooth_records?.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {session.tooth_records.map(tr => (
+                          <span key={tr.id} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 border border-blue-100 rounded-lg text-xs font-semibold text-blue-800">
+                            <span className="font-bold">🦷 Dent #{tr.tooth_number} :</span>
+                            <span className="text-blue-600 capitalize">{tr.treatment_type}</span>
+                            {parseFloat(tr.price) > 0 && <span className="text-gray-500">({parseFloat(tr.price).toFixed(0)} DH)</span>}
+                            {tr.notes && <span className="text-gray-400 font-normal"> - {tr.notes}</span>}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -281,45 +294,51 @@ export default function PatientDetailPage() {
 
         {/* === TAB : ODONTOGRAMME (lecture seule) === */}
         {activeTab === 'odontogram' && (
-          <div className="card">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold">Odontogramme — Historique complet</h3>
-              <Link to={`/patients/${id}/sessions/new`} className="btn btn-primary btn-sm">
-                + Ajouter des soins
-              </Link>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1">
+              <Odontogram value={odontogram} readOnly={true} />
             </div>
-            {odontogram.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Dent (FDI)</th>
-                      <th>Soin</th>
-                      <th>Notes</th>
-                      <th>Prix</th>
-                      <th>Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {odontogram.map((record, i) => (
-                      <tr key={i}>
-                        <td><span className="font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg">#{record.tooth_number}</span></td>
-                        <td className="capitalize font-semibold text-gray-800">{record.treatment_type}</td>
-                        <td className="text-gray-500 text-sm">{record.notes || '—'}</td>
-                        <td className="font-semibold">{parseFloat(record.price || 0).toFixed(0)} DH</td>
-                        <td className="text-gray-500 text-sm">{formatDate(record.created_at)}</td>
+
+            <div className="card lg:col-span-2">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-bold">Historique complet</h3>
+                <Link to={`/patients/${id}/sessions/new`} className="btn btn-primary btn-sm">
+                  + Ajouter des soins
+                </Link>
+              </div>
+              {odontogram.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Dent (FDI)</th>
+                        <th>Soin</th>
+                        <th>Notes</th>
+                        <th>Prix</th>
+                        <th>Date</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="empty-state">
-                <div className="text-5xl mb-4">🦷</div>
-                <h3>Aucun soin dentaire enregistré</h3>
-                <p>Les soins apparaîtront ici après la création d'une séance avec l'odontogramme.</p>
-              </div>
-            )}
+                    </thead>
+                    <tbody>
+                      {odontogram.map((record, i) => (
+                        <tr key={i}>
+                          <td><span className="font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg">#{record.tooth_number}</span></td>
+                          <td className="capitalize font-semibold text-gray-800">{record.treatment_type}</td>
+                          <td className="text-gray-500 text-sm">{record.notes || '—'}</td>
+                          <td className="font-semibold">{parseFloat(record.price || 0).toFixed(0)} DH</td>
+                          <td className="text-gray-500 text-sm">{formatDate(record.created_at)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="empty-state">
+                  <div className="text-5xl mb-4">🦷</div>
+                  <h3>Aucun soin dentaire enregistré</h3>
+                  <p>Les soins apparaîtront ici après la création d'une séance avec l'odontogramme.</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -394,8 +413,8 @@ export default function PatientDetailPage() {
                     <div className="flex-1 h-px bg-gray-100 ml-2"></div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <FormField label="Prénom *" value={editForm.first_name} onChange={v => setEditForm({ ...editForm, first_name: v })} required placeholder="Ahmed" />
-                    <FormField label="Nom *" value={editForm.last_name} onChange={v => setEditForm({ ...editForm, last_name: v })} required placeholder="Benali" />
+                    <FormField label="Prénom" value={editForm.first_name} onChange={v => setEditForm({ ...editForm, first_name: v })} required placeholder="Ahmed" />
+                    <FormField label="Nom" value={editForm.last_name} onChange={v => setEditForm({ ...editForm, last_name: v })} required placeholder="Benali" />
                     <FormField label="Prénom (Arabe)" value={editForm.first_name_ar} onChange={v => setEditForm({ ...editForm, first_name_ar: v })} dir="rtl" placeholder="أحمد" />
                     <FormField label="Nom (Arabe)" value={editForm.last_name_ar} onChange={v => setEditForm({ ...editForm, last_name_ar: v })} dir="rtl" placeholder="بنعلي" />
                     <div className="col-span-2 sm:col-span-1">

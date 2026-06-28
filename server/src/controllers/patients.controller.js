@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Patient, Session, Payment } = require('../models');
+const { Patient, Session, Payment, ToothRecord } = require('../models');
 
 // GET /api/patients — Liste des patients du cabinet
 const getAll = async (req, res, next) => {
@@ -89,6 +89,13 @@ const getById = async (req, res, next) => {
                     limit: 10,
                     order: [['session_date', 'DESC']],
                     attributes: ['id', 'session_date', 'care_type', 'total_price', 'payment_status', 'clinical_notes'],
+                    include: [
+                        {
+                            model: ToothRecord,
+                            as: 'tooth_records',
+                            attributes: ['id', 'tooth_number', 'treatment_type', 'notes', 'price'],
+                        }
+                    ],
                 },
                 {
                     model: Payment,

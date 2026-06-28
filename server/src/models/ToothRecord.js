@@ -41,6 +41,8 @@ const ToothRecord = sequelize.define('tooth_records', {
         type: DataTypes.DECIMAL(10, 2),
         defaultValue: 0,
     },
+}, {
+    updatedAt: false,
 });
 
 module.exports = ToothRecord;

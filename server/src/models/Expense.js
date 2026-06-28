@@ -40,6 +40,8 @@ const Expense = sequelize.define('expenses', {
         type: DataTypes.ENUM('mensuelle', 'ponctuelle', 'variable'),
         defaultValue: 'ponctuelle',
     },
+}, {
+    updatedAt: false,
 });
 
 module.exports = Expense;
