@@ -102,8 +102,17 @@ const getPatientHistory = async (req, res, next) => {
         });
 
         // Récupérer tout l'historique dentaire pour l'odontogramme
+        // (inclut la séance parente pour récupérer session_date)
         const toothRecords = await ToothRecord.findAll({
             where: { patient_id, cabinet_id },
+            include: [
+                {
+                    model: Session,
+                    as: 'session',
+                    attributes: ['id', 'session_date', 'care_type'],
+                    required: false,
+                }
+            ],
             order: [['created_at', 'DESC']],
         });
 

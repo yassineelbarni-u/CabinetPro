@@ -1,5 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { LanguageProvider } from './context/LanguageContext';
+import { ToastProvider } from './context/ToastContext';
+import { PageTransition } from './components/common/PageTransition';
 import MainLayout from './components/layout/MainLayout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
@@ -11,12 +14,10 @@ import PaymentsPage from './pages/PaymentsPage';
 import AccountingPage from './pages/AccountingPage';
 import SettingsPage from './pages/SettingsPage';
 
-import { LanguageProvider } from './context/LanguageContext';
-
 // Composant pour protéger les routes
 const PrivateRoute = ({ children }) => {
   const { token, loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
@@ -24,11 +25,11 @@ const PrivateRoute = ({ children }) => {
       </div>
     );
   }
-  
+
   if (!token) {
     return <Navigate to="/login" replace />;
   }
-  
+
   return children;
 };
 
@@ -36,28 +37,66 @@ function App() {
   return (
     <AuthProvider>
       <LanguageProvider>
-        <Router>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          
-          <Route path="/" element={
-            <PrivateRoute>
-              <MainLayout />
-            </PrivateRoute>
-          }>
-            <Route index element={<DashboardPage />} />
-            <Route path="patients" element={<PatientsPage />} />
-            <Route path="patients/:id" element={<PatientDetailPage />} />
-            <Route path="patients/:patient_id/sessions/new" element={<SessionCreatePage />} />
-            <Route path="appointments" element={<AppointmentsPage />} />
-            <Route path="payments" element={<PaymentsPage />} />
-            <Route path="accounting" element={<AccountingPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-          </Route>
-          
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
+        <ToastProvider>
+          <Router>
+            <Routes>
+              <Route path="/login" element={
+                <PageTransition>
+                  <LoginPage />
+                </PageTransition>
+              } />
+
+              <Route path="/" element={
+                <PrivateRoute>
+                  <MainLayout />
+                </PrivateRoute>
+              }>
+                <Route index element={
+                  <PageTransition>
+                    <DashboardPage />
+                  </PageTransition>
+                } />
+                <Route path="patients" element={
+                  <PageTransition>
+                    <PatientsPage />
+                  </PageTransition>
+                } />
+                <Route path="patients/:id" element={
+                  <PageTransition>
+                    <PatientDetailPage />
+                  </PageTransition>
+                } />
+                <Route path="patients/:patient_id/sessions/new" element={
+                  <PageTransition>
+                    <SessionCreatePage />
+                  </PageTransition>
+                } />
+                <Route path="appointments" element={
+                  <PageTransition>
+                    <AppointmentsPage />
+                  </PageTransition>
+                } />
+                <Route path="payments" element={
+                  <PageTransition>
+                    <PaymentsPage />
+                  </PageTransition>
+                } />
+                <Route path="accounting" element={
+                  <PageTransition>
+                    <AccountingPage />
+                  </PageTransition>
+                } />
+                <Route path="settings" element={
+                  <PageTransition>
+                    <SettingsPage />
+                  </PageTransition>
+                } />
+              </Route>
+
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Router>
+        </ToastProvider>
       </LanguageProvider>
     </AuthProvider>
   );

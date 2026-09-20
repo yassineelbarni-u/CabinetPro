@@ -6,8 +6,9 @@ import {
   Clock, Stethoscope, FileText, Shield
 } from 'lucide-react';
 import api from '../api/axios';
-import { formatDate, calculateAge, PATIENT_TYPE_LABELS } from '../utils/formatters';
+import { formatDate, formatDateTime, calculateAge, PATIENT_TYPE_LABELS } from '../utils/formatters';
 import Odontogram from '../components/patients/Odontogram';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const PAYMENT_STATUS = {
   paid: { label: 'Payé', class: 'bg-emerald-100 text-emerald-700' },
@@ -21,6 +22,8 @@ export default function PatientDetailPage() {
   const [odontogram, setOdontogram] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+
+  usePageTitle(patient ? `${patient.first_name} ${patient.last_name}` : 'Dossier Patient');
 
   // Edit modal state
   const [isEditing, setIsEditing] = useState(false);
@@ -252,7 +255,7 @@ export default function PatientDetailPage() {
                     <div className="flex justify-between items-start mb-3">
                       <div>
                         <div className="font-bold text-gray-900 text-base">{session.care_type || 'Consultation'}</div>
-                        <div className="text-sm text-gray-500 mt-0.5">{formatDate(session.session_date)}</div>
+                        <div className="text-sm text-gray-500 mt-0.5">{formatDateTime(session.session_date)}</div>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="font-bold text-gray-800">{parseFloat(session.total_price || 0).toFixed(0)} DH</span>
@@ -325,7 +328,13 @@ export default function PatientDetailPage() {
                           <td className="capitalize font-semibold text-gray-800">{record.treatment_type}</td>
                           <td className="text-gray-500 text-sm">{record.notes || '—'}</td>
                           <td className="font-semibold">{parseFloat(record.price || 0).toFixed(0)} DH</td>
-                          <td className="text-gray-500 text-sm">{formatDate(record.created_at)}</td>
+                          <td className="text-gray-500 text-sm">
+                            {record.session?.session_date
+                              ? formatDateTime(record.session.session_date)
+                              : record.createdAt
+                                ? formatDateTime(record.createdAt)
+                                : '—'}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -364,7 +373,7 @@ export default function PatientDetailPage() {
                   <tbody>
                     {patient.payments.map(p => (
                       <tr key={p.id}>
-                        <td>{formatDate(p.payment_date)}</td>
+                        <td>{formatDateTime(p.payment_date || p.createdAt)}</td>
                         <td className="font-bold text-emerald-700">+{parseFloat(p.amount).toFixed(0)} DH</td>
                         <td className="capitalize text-gray-600">{p.payment_method}</td>
                       </tr>

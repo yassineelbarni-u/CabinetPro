@@ -4,8 +4,12 @@ import {
   Clock, ArrowRight, ChevronRight, Banknote, Activity,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+} from 'recharts';
 import api from '../api/axios';
 import { formatCurrency, formatDateTime } from '../utils/formatters';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const KPI_CONFIG = [
   {
@@ -16,7 +20,6 @@ const KPI_CONFIG = [
     gradientStart: '#06B6D4',
     gradientEnd: '#0891B2',
     format: v => v,
-    unit: '',
   },
   {
     key: 'revenue_today',
@@ -26,7 +29,6 @@ const KPI_CONFIG = [
     gradientStart: '#10B981',
     gradientEnd: '#059669',
     format: v => formatCurrency(v),
-    unit: '',
   },
   {
     key: 'unpaid_total',
@@ -36,7 +38,6 @@ const KPI_CONFIG = [
     gradientStart: '#F59E0B',
     gradientEnd: '#D97706',
     format: v => formatCurrency(v),
-    unit: '',
   },
   {
     key: 'net_profit',
@@ -58,7 +59,61 @@ const STATUS_DOT = {
   cancelled: '#EF4444',
 };
 
+/* ── Skeleton pour les KPI cards ── */
+function StatCardSkeleton() {
+  return (
+    <div className="stat-card">
+      <div className="stat-info">
+        <div className="skeleton skeleton-text-sm" style={{ width: 120, marginBottom: 10 }} />
+        <div className="skeleton skeleton-text" style={{ width: 90, height: 32 }} />
+        <div className="skeleton skeleton-text-sm" style={{ width: 70, marginTop: 8 }} />
+      </div>
+      <div className="skeleton skeleton-rect" style={{ width: 52, height: 52, flexShrink: 0 }} />
+    </div>
+  );
+}
+
+/* ── Skeleton pour les listes ── */
+function ListItemSkeleton() {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '0.875rem',
+      padding: '0.75rem 0.875rem', borderRadius: 14,
+      border: '1px solid #F1F5F9',
+    }}>
+      <div className="skeleton skeleton-rect" style={{ width: 46, height: 46, flexShrink: 0 }} />
+      <div style={{ flex: 1 }}>
+        <div className="skeleton skeleton-text" style={{ width: '60%', marginBottom: 6 }} />
+        <div className="skeleton skeleton-text-sm" style={{ width: '40%' }} />
+      </div>
+    </div>
+  );
+}
+
+/* ── Tooltip Recharts personnalisé ── */
+function CustomTooltip({ active, payload, label }) {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{
+        background: 'rgba(255,255,255,0.97)',
+        border: '1px solid #A5F3FC',
+        borderRadius: 10,
+        padding: '0.625rem 0.875rem',
+        boxShadow: '0 4px 16px rgba(6,182,212,0.15)',
+      }}>
+        <p style={{ fontSize: '0.75rem', color: '#8BA7BE', marginBottom: 2 }}>{label}</p>
+        <p style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#0E7490' }}>
+          {formatCurrency(payload[0].value)}
+        </p>
+      </div>
+    );
+  }
+  return null;
+}
+
 export default function DashboardPage() {
+  usePageTitle('Tableau de bord');
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -73,19 +128,19 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        height: 'calc(100vh - 120px)',
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div className="spinner" style={{ margin: '0 auto 1rem' }} />
-          <p style={{ fontSize: '0.875rem', color: '#8BA7BE' }}>Chargement du tableau de bord...</p>
-        </div>
-      </div>
-    );
-  }
+  /* ── Générer des données de graphique sur 7 jours ── */
+  const revenueChartData = (() => {
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      days.push({
+        day: d.toLocaleDateString('fr-MA', { weekday: 'short', day: 'numeric' }),
+        amount: i === 0 ? (parseFloat(data?.revenue_today) || 0) : 0,
+      });
+    }
+    return days;
+  })();
 
   if (error) {
     return (
@@ -119,27 +174,95 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* KPI Cards */}
+      {/* KPI Cards — Skeleton ou données réelles */}
       <div className="stat-cards">
-        {KPI_CONFIG.map(({ key, label, icon: Icon, iconClass, gradientStart, gradientEnd, format, trend }) => (
-          <div
-            key={key}
-            className="stat-card"
-            style={{ '--gradient-start': gradientStart, '--gradient-end': gradientEnd }}
-          >
-            <div className="stat-info">
-              <div className="stat-label">{label}</div>
-              <div className="stat-value">
-                {data[key] !== undefined ? format(data[key]) : '—'}
+        {loading ? (
+          <>
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </>
+        ) : (
+          KPI_CONFIG.map(({ key, label, icon: Icon, iconClass, gradientStart, gradientEnd, format, trend }) => (
+            <div
+              key={key}
+              className="stat-card"
+              style={{ '--gradient-start': gradientStart, '--gradient-end': gradientEnd }}
+            >
+              <div className="stat-info">
+                <div className="stat-label">{label}</div>
+                <div className="stat-value">
+                  {data?.[key] !== undefined ? format(data[key]) : '—'}
+                </div>
+                {trend && <div className="stat-trend">{trend}</div>}
               </div>
-              {trend && <div className="stat-trend">{trend}</div>}
+              <div className={`stat-icon ${iconClass}`}>
+                <Icon style={{ width: 22, height: 22 }} />
+              </div>
             </div>
-            <div className={`stat-icon ${iconClass}`}>
-              <Icon style={{ width: 22, height: 22 }} />
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
+
+      {/* Graphique Recettes — Recharts */}
+      {!loading && (
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          <div style={{
+            padding: '1.25rem 1.5rem',
+            borderBottom: '1px solid #E0EEF2',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          }}>
+            <h3 className="card-title">
+              <TrendingUp style={{ width: 18, height: 18, color: '#06B6D4' }} />
+              Recettes — 7 derniers jours
+            </h3>
+            <span style={{
+              fontSize: '0.75rem', fontWeight: 600,
+              padding: '0.25rem 0.75rem', borderRadius: 99,
+              background: '#CFFAFE', color: '#0E7490', border: '1px solid #A5F3FC',
+            }}>
+              MAD
+            </span>
+          </div>
+          <div style={{ padding: '1.25rem 0.5rem 0.5rem' }}>
+            <ResponsiveContainer width="100%" height={180}>
+              <AreaChart data={revenueChartData} margin={{ top: 4, right: 20, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="tealGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#06B6D4" stopOpacity={0.22} />
+                    <stop offset="100%" stopColor="#06B6D4" stopOpacity={0.01} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E0EEF2" vertical={false} />
+                <XAxis
+                  dataKey="day"
+                  tick={{ fontSize: 11, fill: '#8BA7BE', fontWeight: 500 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 11, fill: '#8BA7BE' }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={v => v === 0 ? '0' : `${(v/1000).toFixed(0)}k`}
+                  width={36}
+                />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#A5F3FC', strokeWidth: 1, strokeDasharray: '4 2' }} />
+                <Area
+                  type="monotone"
+                  dataKey="amount"
+                  stroke="#06B6D4"
+                  strokeWidth={2.5}
+                  fill="url(#tealGradient)"
+                  dot={{ fill: '#06B6D4', strokeWidth: 0, r: 3 }}
+                  activeDot={{ fill: '#0891B2', r: 5, strokeWidth: 0 }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
 
       {/* Section 2 colonnes */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.25rem' }}>
@@ -147,7 +270,6 @@ export default function DashboardPage() {
 
           {/* ── Prochains RDV ── */}
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-            {/* Header de card */}
             <div style={{
               padding: '1.25rem 1.5rem',
               borderBottom: '1px solid #E0EEF2',
@@ -168,29 +290,21 @@ export default function DashboardPage() {
               </Link>
             </div>
 
-            {/* Items */}
             <div style={{ padding: '0.75rem 1rem' }}>
-              {data.next_appointments?.length > 0 ? (
+              {loading ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                  <ListItemSkeleton />
+                  <ListItemSkeleton />
+                  <ListItemSkeleton />
+                </div>
+              ) : data?.next_appointments?.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
                   {data.next_appointments.map(apt => {
                     const aptDate = new Date(apt.appointment_date);
                     return (
                       <div
                         key={apt.id}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: '0.875rem',
-                          padding: '0.75rem 0.875rem', borderRadius: 14,
-                          border: '1px solid #F1F5F9', transition: 'all 0.2s',
-                          cursor: 'default',
-                        }}
-                        onMouseEnter={e => {
-                          e.currentTarget.style.background = '#F0FDFF';
-                          e.currentTarget.style.borderColor = '#A5F3FC';
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.background = 'transparent';
-                          e.currentTarget.style.borderColor = '#F1F5F9';
-                        }}
+                        className="apt-item"
                       >
                         {/* Date block */}
                         <div style={{
@@ -246,8 +360,7 @@ export default function DashboardPage() {
                             color: '#8BA7BE', transition: 'all 0.2s', textDecoration: 'none',
                             border: '1px solid #E0EEF2',
                           }}
-                          onMouseEnter={e => { e.currentTarget.style.background='#CFFAFE'; e.currentTarget.style.color='#0891B2'; e.currentTarget.style.borderColor='#A5F3FC'; }}
-                          onMouseLeave={e => { e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#8BA7BE'; e.currentTarget.style.borderColor='#E0EEF2'; }}
+                          className="header-btn-icon"
                         >
                           <ChevronRight style={{ width: 14, height: 14 }} />
                         </Link>
@@ -257,8 +370,18 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="empty-state" style={{ padding: '2rem' }}>
-                  <CalendarIcon />
-                  <p style={{ fontSize: '0.875rem' }}>Aucun rendez-vous à venir.</p>
+                  <div style={{
+                    width: 56, height: 56, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #F0FDFF, #ECFDF5)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: 8,
+                  }}>
+                    <CalendarIcon style={{ width: 24, height: 24, color: '#06B6D4' }} />
+                  </div>
+                  <p style={{ fontSize: '0.875rem', color: '#4A6580' }}>Aucun rendez-vous à venir.</p>
+                  <Link to="/appointments" className="btn btn-primary btn-sm" style={{ textDecoration: 'none', marginTop: 8 }}>
+                    Planifier un RDV
+                  </Link>
                 </div>
               )}
             </div>
@@ -287,7 +410,13 @@ export default function DashboardPage() {
             </div>
 
             <div style={{ padding: '0.75rem 1rem' }}>
-              {data.recent_patients?.length > 0 ? (
+              {loading ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                  <ListItemSkeleton />
+                  <ListItemSkeleton />
+                  <ListItemSkeleton />
+                </div>
+              ) : data?.recent_patients?.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
                   {data.recent_patients.map(patient => (
                     <div
@@ -297,8 +426,7 @@ export default function DashboardPage() {
                         padding: '0.75rem 0.875rem', borderRadius: 14,
                         border: '1px solid #F1F5F9', transition: 'all 0.2s',
                       }}
-                      onMouseEnter={e => { e.currentTarget.style.background='#ECFDF5'; e.currentTarget.style.borderColor='#A7F3D0'; }}
-                      onMouseLeave={e => { e.currentTarget.style.background='transparent'; e.currentTarget.style.borderColor='#F1F5F9'; }}
+                      className="apt-item"
                     >
                       <div className="patient-avatar" style={{
                         background: 'linear-gradient(135deg, #D1FAE5, #A7F3D0)',
@@ -326,8 +454,18 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="empty-state" style={{ padding: '2rem' }}>
-                  <Users />
-                  <p style={{ fontSize: '0.875rem' }}>Aucun patient enregistré récemment.</p>
+                  <div style={{
+                    width: 56, height: 56, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #ECFDF5, #D1FAE5)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: 8,
+                  }}>
+                    <Users style={{ width: 24, height: 24, color: '#10B981' }} />
+                  </div>
+                  <p style={{ fontSize: '0.875rem', color: '#4A6580' }}>Aucun patient enregistré récemment.</p>
+                  <Link to="/patients" className="btn btn-accent btn-sm" style={{ textDecoration: 'none', marginTop: 8 }}>
+                    Ajouter un patient
+                  </Link>
                 </div>
               )}
             </div>

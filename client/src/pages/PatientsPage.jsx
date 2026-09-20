@@ -6,6 +6,9 @@ import {
 } from 'lucide-react';
 import api from '../api/axios';
 import { formatDate, PATIENT_TYPE_LABELS } from '../utils/formatters';
+import { useToast } from '../context/ToastContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+
 
 /* ──────────── Couverture médicale chips ──────────── */
 const COVERAGE_OPTIONS = [
@@ -24,6 +27,8 @@ const TYPE_BADGE = {
 };
 
 export default function PatientsPage() {
+  usePageTitle('Patients');
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -68,7 +73,7 @@ export default function PatientsPage() {
       setFormData({ first_name: '', last_name: '', phone_primary: '', city: '', patient_type: 'particulier' });
       navigate(`/patients/${res.data.data.id}`);
     } catch (err) {
-      alert('Erreur lors de la création : ' + (err.response?.data?.message || err.message));
+      showToast('error', 'Erreur lors de la création : ' + (err.response?.data?.message || err.message));
       setSaving(false);
     }
   };
@@ -113,12 +118,45 @@ export default function PatientsPage() {
         {/* Tableau */}
         <div className="table-container">
           {loading ? (
-            <div style={{ padding: '3rem', display: 'flex', justifyContent: 'center' }}>
-              <div className="spinner" />
-            </div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Patient</th><th>Contact</th><th>Couverture</th>
+                  <th>Dernière activité</th><th style={{ textAlign: 'center' }}>Séances</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...Array(5)].map((_, i) => (
+                  <tr key={i}>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div className="skeleton skeleton-circle" style={{ width: 40, height: 40, flexShrink: 0 }} />
+                        <div>
+                          <div className="skeleton skeleton-text" style={{ width: 130, marginBottom: 4 }} />
+                          <div className="skeleton skeleton-text-sm" style={{ width: 80 }} />
+                        </div>
+                      </div>
+                    </td>
+                    <td><div className="skeleton skeleton-text" style={{ width: 90 }} /></td>
+                    <td><div className="skeleton skeleton-rect" style={{ width: 70, height: 22 }} /></td>
+                    <td><div className="skeleton skeleton-text" style={{ width: 80 }} /></td>
+                    <td style={{ textAlign: 'center' }}><div className="skeleton skeleton-circle" style={{ width: 32, height: 32, margin: '0 auto' }} /></td>
+                    <td style={{ textAlign: 'right' }}><div className="skeleton skeleton-rect" style={{ width: 80, height: 30 }} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           ) : patients.length === 0 ? (
             <div className="empty-state" style={{ padding: '3.5rem 2rem' }}>
-              <Users />
+              <div style={{
+                width: 72, height: 72, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #F0FDFF, #ECFDF5)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                marginBottom: 8,
+              }}>
+                <Users style={{ width: 32, height: 32, color: '#06B6D4' }} />
+              </div>
               <h3>Aucun patient trouvé</h3>
               <p>Commencez par ajouter un nouveau patient ou modifiez votre recherche.</p>
               <button onClick={() => setIsModalOpen(true)} className="btn btn-primary" style={{ marginTop: '0.75rem' }}>
@@ -233,8 +271,8 @@ export default function PatientsPage() {
 
       {/* ===== MODAL NOUVEAU PATIENT ===== */}
       {isModalOpen && (
-        <div className="modal-overlay animate-fade-in">
-          <div className="modal-container animate-slide-up" style={{ maxWidth: 500 }}>
+        <div className="modal-overlay animate-fade-in" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-container animate-slide-up" style={{ maxWidth: 500 }} onClick={e => e.stopPropagation()}>
 
             {/* Header teal */}
             <div className="modal-header-teal">

@@ -5,6 +5,7 @@ import {
   Check, PieChart, Banknote,
 } from 'lucide-react';
 import api from '../api/axios';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 /* ───────── Catégories — chips avec émojis ───────── */
 const CATEGORY_CHIPS = [
@@ -42,6 +43,7 @@ const EMPTY_FORM = {
 };
 
 export default function AccountingPage() {
+  usePageTitle('Comptabilité');
   const [summary, setSummary] = useState({ income: 0, expense: 0, net_profit: 0 });
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -342,8 +344,8 @@ export default function AccountingPage() {
 
       {/* ===== MODAL AJOUT CHARGE ===== */}
       {isModalOpen && (
-        <div className="modal-overlay animate-fade-in">
-          <div className="modal-container animate-slide-up" style={{ maxWidth: 560 }}>
+        <div className="modal-overlay animate-fade-in" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-container animate-slide-up" style={{ maxWidth: 560 }} onClick={e => e.stopPropagation()}>
 
             {/* Header gradient teal → rose pour distinguer des paiements */}
             <div style={{

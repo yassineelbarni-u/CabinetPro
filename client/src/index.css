@@ -373,6 +373,56 @@ body {
 }
 
 /* ================================================================
+   Header Buttons — Réutilisables (remplace les onMouseEnter/Leave inline)
+   ================================================================ */
+.header-btn {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-family: var(--font-sans);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.header-btn:hover {
+  border-color: #06B6D4;
+  background: #F0FDFF;
+  color: #0891B2;
+}
+
+.header-btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 10px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.header-btn-icon:hover {
+  border-color: #06B6D4;
+  background: #F0FDFF;
+  color: #0891B2;
+}
+
+/* ================================================================
    Header / Topbar
    ================================================================ */
 .header {
@@ -692,6 +742,11 @@ body {
 
 .table tbody tr:hover td {
   background: #F0FDFF;
+}
+
+.table tbody tr:hover td:first-child {
+  border-left: 3px solid #06B6D4;
+  padding-left: calc(1.25rem - 3px);
 }
 
 /* ================================================================
@@ -1571,4 +1626,137 @@ select {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ================================================================
+   Toast Notifications — Système global
+   ================================================================ */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+  }
+}
+
+.toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  pointer-events: none;
+  max-width: 380px;
+  width: calc(100% - 3rem);
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
+  animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+  pointer-events: all;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid transparent;
+}
+
+.toast-success {
+  background: rgba(236, 253, 245, 0.97);
+  color: #065F46;
+  border-color: #A7F3D0;
+}
+
+.toast-success .toast-icon { color: #059669; }
+
+.toast-error {
+  background: rgba(254, 242, 242, 0.97);
+  color: #991B1B;
+  border-color: #FECACA;
+}
+
+.toast-error .toast-icon { color: #DC2626; }
+
+.toast-info {
+  background: rgba(240, 253, 255, 0.97);
+  color: #0E7490;
+  border-color: #A5F3FC;
+}
+
+.toast-info .toast-icon { color: #06B6D4; }
+
+.toast-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  font-family: var(--font-sans);
+}
+
+.toast-close {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  transition: all 0.15s ease;
+  color: currentColor;
+  font-family: var(--font-sans);
+}
+
+.toast-close:hover {
+  opacity: 1;
+  background: rgba(0,0,0,0.06);
+}
+
+/* ================================================================
+   Skeleton amélioré — variantes
+   ================================================================ */
+.skeleton-text {
+  height: 0.875rem;
+  border-radius: 4px;
+}
+
+.skeleton-text-sm {
+  height: 0.75rem;
+  border-radius: 4px;
+}
+
+.skeleton-circle {
+  border-radius: 50%;
+}
+
+.skeleton-rect {
+  border-radius: 8px;
 }

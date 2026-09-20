@@ -5,6 +5,7 @@ import {
   X, Shield, Info,
 } from 'lucide-react';
 import api from '../api/axios';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const TABS = [
   { id: 'info',   label: 'Informations',  icon: Building2, emoji: '🏥' },
@@ -33,6 +34,7 @@ function FormField({ label, icon: Icon, required, hint, children }) {
 }
 
 export default function SettingsPage() {
+  usePageTitle('Paramètres');
   const [activeTab, setActiveTab] = useState('info');
   const [form, setForm] = useState({ name: '', address: '', city: '', phone: '', email: '' });
   const [loading, setLoading] = useState(true);

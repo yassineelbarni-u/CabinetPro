@@ -11,7 +11,7 @@ const GREETING = () => {
 
 export default function Header({ toggleSidebar }) {
   const { user } = useAuth();
-  const { t, language, toggleLanguage } = useLanguage();
+  const { language, toggleLanguage } = useLanguage();
 
   const now = new Date().toLocaleDateString('fr-MA', {
     weekday: 'long', day: 'numeric', month: 'long',
@@ -24,16 +24,8 @@ export default function Header({ toggleSidebar }) {
         {/* Hamburger mobile */}
         <button
           onClick={toggleSidebar}
-          className="lg:hidden"
+          className="header-btn-icon lg:hidden"
           aria-label="Ouvrir le menu"
-          style={{
-            padding: 8, borderRadius: 10, border: '1.5px solid #E0EEF2',
-            background: '#F8FAFC', cursor: 'pointer', display: 'flex',
-            alignItems: 'center', justifyContent: 'center',
-            color: '#4A6580', transition: 'all 0.2s',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor='#06B6D4'; e.currentTarget.style.background='#F0FDFF'; e.currentTarget.style.color='#0891B2'; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor='#E0EEF2'; e.currentTarget.style.background='#F8FAFC'; e.currentTarget.style.color='#4A6580'; }}
         >
           <Menu style={{ width: 18, height: 18 }} />
         </button>
@@ -53,18 +45,9 @@ export default function Header({ toggleSidebar }) {
         {/* Switcher langue */}
         <button
           onClick={toggleLanguage}
+          className="header-btn"
           title="Changer la langue"
           aria-label="Changer la langue"
-          style={{
-            height: 36, padding: '0 12px', borderRadius: 10,
-            border: '1.5px solid #E0EEF2', background: '#F8FAFC',
-            color: '#4A6580', cursor: 'pointer',
-            fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.04em',
-            display: 'flex', alignItems: 'center', gap: 5,
-            transition: 'all 0.2s', fontFamily: 'var(--font-sans)',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor='#06B6D4'; e.currentTarget.style.background='#F0FDFF'; e.currentTarget.style.color='#0891B2'; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor='#E0EEF2'; e.currentTarget.style.background='#F8FAFC'; e.currentTarget.style.color='#4A6580'; }}
         >
           <Globe style={{ width: 13, height: 13 }} />
           {language === 'fr' ? 'عربي' : 'FR'}
@@ -72,16 +55,9 @@ export default function Header({ toggleSidebar }) {
 
         {/* Notifications */}
         <button
+          className="header-btn-icon"
           title="Notifications"
           aria-label="Voir les notifications"
-          style={{
-            position: 'relative', width: 36, height: 36, borderRadius: 10,
-            border: '1.5px solid #E0EEF2', background: '#F8FAFC',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#4A6580', cursor: 'pointer', transition: 'all 0.2s',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor='#06B6D4'; e.currentTarget.style.background='#F0FDFF'; e.currentTarget.style.color='#0891B2'; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor='#E0EEF2'; e.currentTarget.style.background='#F8FAFC'; e.currentTarget.style.color='#4A6580'; }}
         >
           <Bell style={{ width: 16, height: 16 }} />
           <span className="notif-dot" />
@@ -91,11 +67,7 @@ export default function Header({ toggleSidebar }) {
         <div style={{ width: 1, height: 28, background: '#E0EEF2', margin: '0 4px' }} />
 
         {/* Avatar utilisateur */}
-        <div
-          style={{
-            display: 'flex', alignItems: 'center', gap: '0.625rem',
-          }}
-        >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
           <div
             style={{
               width: 36, height: 36, borderRadius: 10,

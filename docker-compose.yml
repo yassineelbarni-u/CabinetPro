@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   cabinet_postgres:
-    image: postgres:16-alpine
+    image: docker.io/library/postgres:16-alpine
     container_name: cabinet_postgres
     restart: unless-stopped
     environment:
@@ -13,7 +13,7 @@ services:
       - "5433:5432"
     volumes:
       - cabinet_pg_data:/var/lib/postgresql/data
-      - ./server/src/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./server/src/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro,z
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U cabinet_admin -d cabinetpro"]
       interval: 10s
@@ -21,7 +21,7 @@ services:
       retries: 5
 
   cabinet_pgadmin:
-    image: dpage/pgadmin4:latest
+    image: docker.io/dpage/pgadmin4:latest
     container_name: cabinet_pgadmin
     restart: unless-stopped
     environment:

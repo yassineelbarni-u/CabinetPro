@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import api from '../api/axios';
 import { generateInvoicePDF } from '../utils/invoiceGenerator';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 /* ───────── Méthode de paiement — chips ───────── */
 const METHOD_CHIPS = [
@@ -39,6 +40,7 @@ const EMPTY_FORM = {
 };
 
 export default function PaymentsPage() {
+  usePageTitle('Paiements');
   const [payments, setPayments] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -366,8 +368,8 @@ export default function PaymentsPage() {
 
       {/* ===== MODAL PAIEMENT ===== */}
       {isModalOpen && (
-        <div className="modal-overlay animate-fade-in">
-          <div className="modal-container animate-slide-up" style={{ maxWidth: 540 }}>
+        <div className="modal-overlay animate-fade-in" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-container animate-slide-up" style={{ maxWidth: 540 }} onClick={e => e.stopPropagation()}>
 
             {/* Header gradient teal */}
             <div className="modal-header-teal">

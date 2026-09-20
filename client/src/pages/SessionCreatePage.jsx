@@ -3,8 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Save, AlertCircle, ArrowLeft } from 'lucide-react';
 import api from '../api/axios';
 import Odontogram from '../components/patients/Odontogram';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function SessionCreatePage() {
+  usePageTitle('Nouvelle Séance');
   const { patient_id } = useParams();
   const navigate = useNavigate();
   
@@ -14,6 +16,11 @@ export default function SessionCreatePage() {
   const [error, setError] = useState('');
 
   // Form state
+  const [sessionDate, setSessionDate] = useState(() => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16);
+  });
   const [careType, setCareType] = useState('Consultation générale');
   const [clinicalNotes, setClinicalNotes] = useState('');
   const [prescription, setPrescription] = useState('');
@@ -43,6 +50,7 @@ export default function SessionCreatePage() {
     try {
       await api.post('/sessions', {
         patient_id,
+        session_date: sessionDate ? new Date(sessionDate).toISOString() : new Date().toISOString(),
         care_type: careType,
         clinical_notes: clinicalNotes,
         prescription,
@@ -100,6 +108,16 @@ export default function SessionCreatePage() {
             <h3 className="card-title mb-4">Informations générales</h3>
             
             <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Date et Heure de la séance</label>
+                <input 
+                  type="datetime-local" 
+                  value={sessionDate}
+                  onChange={(e) => setSessionDate(e.target.value)}
+                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                />
+              </div>
+
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Motif de consultation</label>
                 <input 

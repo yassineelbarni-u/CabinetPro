@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import api from '../api/axios';
 import { formatDate } from '../utils/formatters';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 /* ───────── Statut config ───────── */
 const STATUS_CONFIG = {
@@ -44,6 +45,7 @@ const TIME_SLOTS = generateTimeSlots();
 const DURATIONS = [15, 30, 45, 60];
 
 export default function AppointmentsPage() {
+  usePageTitle('Rendez-vous');
   const [appointments, setAppointments] = useState([]);
   const [queue, setQueue] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -400,8 +402,8 @@ export default function AppointmentsPage() {
 
       {/* ===== MODAL NOUVEAU RENDEZ-VOUS ===== */}
       {isModalOpen && (
-        <div className="modal-overlay animate-fade-in">
-          <div className="modal-container animate-slide-up" style={{ maxWidth: 560 }}>
+        <div className="modal-overlay animate-fade-in" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-container animate-slide-up" style={{ maxWidth: 560 }} onClick={e => e.stopPropagation()}>
 
             {/* Header gradient teal */}
             <div className="modal-header-teal">
