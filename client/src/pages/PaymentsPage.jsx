@@ -395,7 +395,7 @@ export default function PaymentsPage() {
             </div>
 
             {/* Corps formulaire */}
-            <div style={{ maxHeight: '70vh', overflowY: 'auto', padding: '1.5rem' }}>
+            <div className="modal-body">
               <form id="pay-form" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 {error && (
                   <div className="alert alert-danger">

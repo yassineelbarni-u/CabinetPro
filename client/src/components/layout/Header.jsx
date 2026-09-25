@@ -1,6 +1,7 @@
-import { Menu, Bell, Globe } from 'lucide-react';
+import { Menu, Globe } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import NotificationPanel from './NotificationPanel';
 
 const GREETING = () => {
   const h = new Date().getHours();
@@ -54,14 +55,7 @@ export default function Header({ toggleSidebar }) {
         </button>
 
         {/* Notifications */}
-        <button
-          className="header-btn-icon"
-          title="Notifications"
-          aria-label="Voir les notifications"
-        >
-          <Bell style={{ width: 16, height: 16 }} />
-          <span className="notif-dot" />
-        </button>
+        <NotificationPanel />
 
         {/* Séparateur */}
         <div style={{ width: 1, height: 28, background: '#E0EEF2', margin: '0 4px' }} />

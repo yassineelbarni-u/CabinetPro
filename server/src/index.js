@@ -17,6 +17,7 @@ const sessionsRoutes = require('./routes/sessions.routes');
 const paymentsRoutes = require('./routes/payments.routes');
 const accountingRoutes = require('./routes/accounting.routes');
 const cabinetRoutes = require('./routes/cabinet.routes');
+const notificationsRoutes = require('./routes/notifications.routes');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -44,6 +45,7 @@ app.use('/api/sessions', sessionsRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/accounting', accountingRoutes);
 app.use('/api/cabinet', cabinetRoutes);
+app.use('/api/notifications', notificationsRoutes);
 
 // Route de santé
 app.get('/api/health', (req, res) => {

@@ -297,8 +297,8 @@ export default function PatientsPage() {
             </div>
 
             {/* Formulaire */}
-            <form onSubmit={handleCreatePatient}>
-              <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.125rem' }}>
+            <form onSubmit={handleCreatePatient} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.125rem' }}>
 
                 {/* Prénom + Nom */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>

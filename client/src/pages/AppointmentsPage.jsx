@@ -432,7 +432,7 @@ export default function AppointmentsPage() {
             </div>
 
             {/* Corps du formulaire avec scroll */}
-            <div style={{ maxHeight: '72vh', overflowY: 'auto', padding: '1.5rem' }}>
+            <div className="modal-body">
               <form id="apt-form" onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '1.375rem' }}>
                 {error && (
                   <div className="alert alert-danger">

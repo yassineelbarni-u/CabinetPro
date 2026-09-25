@@ -393,24 +393,38 @@ export default function PatientDetailPage() {
 
       {/* === MODAL D'ÉDITION — CENTRÉ === */}
       {isEditing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-auto overflow-hidden animate-slide-up">
+        <div className="modal-overlay animate-fade-in" onClick={() => setIsEditing(false)}>
+          <div className="modal-container animate-slide-up" style={{ maxWidth: 640 }} onClick={e => e.stopPropagation()}>
 
             {/* Header gradient */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-6 py-5">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-xl font-bold text-white">Modifier le dossier patient</h3>
-                  <p className="text-blue-200 text-sm mt-0.5">{patient.first_name} {patient.last_name}</p>
-                </div>
-                <button onClick={() => setIsEditing(false)} className="text-white/60 hover:text-white p-1 hover:bg-white/10 rounded-lg transition-colors mt-0.5">
-                  <X className="w-6 h-6" />
-                </button>
+            <div style={{
+              background: 'linear-gradient(135deg, #0F2A3F 0%, #1E3A5F 50%, #06B6D4 100%)',
+              padding: '1.375rem 1.5rem',
+              display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+              flexShrink: 0,
+            }}>
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em' }}>
+                  ✏️ Modifier le dossier patient
+                </h3>
+                <p style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.65)', marginTop: 2 }}>
+                  {patient.first_name} {patient.last_name}
+                </p>
               </div>
+              <button
+                onClick={() => setIsEditing(false)}
+                style={{
+                  background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.20)',
+                  borderRadius: 10, padding: 8, cursor: 'pointer', color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <X style={{ width: 20, height: 20 }} />
+              </button>
             </div>
 
-            <form onSubmit={handleSave}>
-              <div className="px-6 py-6 space-y-7 max-h-[70vh] overflow-y-auto">
+            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+              <div className="modal-body space-y-7">
 
                 {/* Section 1 — Identité */}
                 <div>
@@ -494,25 +508,23 @@ export default function PatientDetailPage() {
               </div>
 
               {/* Footer fixe */}
-              <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
-                <p className="text-xs text-gray-400">Les champs marqués * sont obligatoires</p>
-                <div className="flex gap-3">
-                  <button type="button" onClick={() => setIsEditing(false)} className="btn btn-secondary px-5">
-                    Annuler
-                  </button>
-                  <button type="submit" disabled={saving} className="btn btn-primary px-7">
-                    {saving ? (
-                      <span className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Enregistrement...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <Save className="w-4 h-4" /> Enregistrer les modifications
-                      </span>
-                    )}
-                  </button>
-                </div>
+              <div className="modal-footer">
+                <p className="text-xs text-gray-400 mr-auto">Les champs marqués * sont obligatoires</p>
+                <button type="button" onClick={() => setIsEditing(false)} className="btn btn-secondary px-5">
+                  Annuler
+                </button>
+                <button type="submit" disabled={saving} className="btn btn-primary px-7">
+                  {saving ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Enregistrement...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Save className="w-4 h-4" /> Enregistrer les modifications
+                    </span>
+                  )}
+                </button>
               </div>
             </form>
 

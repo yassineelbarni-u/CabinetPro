@@ -237,16 +237,32 @@ export default function Odontogram({ value, onChange, readOnly = false }) {
 
       {/* Modal d'édition */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transform transition-all scale-100">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-gray-800">Soin — Dent {selectedTooth}</h3>
-              <button onClick={() => setIsModalOpen(false)} className="p-1.5 bg-gray-100 rounded-full text-gray-500 hover:text-gray-900 transition-colors">
-                <X className="w-5 h-5" />
+        <div className="modal-overlay animate-fade-in" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-container animate-slide-up" style={{ maxWidth: 480 }} onClick={e => e.stopPropagation()}>
+            
+            {/* Header teal */}
+            <div className="modal-header-teal">
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em' }}>
+                  🦷 Soin — Dent #{selectedTooth}
+                </h3>
+                <p style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.65)', marginTop: 2 }}>
+                  Sélectionnez l'acte dentaire et saisissez le tarif
+                </p>
+              </div>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                style={{
+                  background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.20)',
+                  borderRadius: 10, padding: 8, cursor: 'pointer', color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <X style={{ width: 18, height: 18 }} />
               </button>
             </div>
 
-            <div className="space-y-5">
+            <div className="modal-body space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Acte médical</label>
                 <div className="grid grid-cols-2 gap-2">
@@ -287,14 +303,15 @@ export default function Odontogram({ value, onChange, readOnly = false }) {
                   placeholder="Détails de l'intervention..."
                 ></textarea>
               </div>
-
-              <div className="flex justify-end gap-3 pt-5 border-t border-gray-100">
-                <button onClick={() => setIsModalOpen(false)} className="btn btn-secondary px-5">Annuler</button>
-                <button onClick={saveTooth} className="btn btn-primary px-5">
-                  <Check className="w-4 h-4 mr-1" /> Enregistrer
-                </button>
-              </div>
             </div>
+
+            <div className="modal-footer">
+              <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-secondary px-5">Annuler</button>
+              <button type="button" onClick={saveTooth} className="btn btn-primary px-5">
+                <Check className="w-4 h-4 mr-1 inline" /> Enregistrer
+              </button>
+            </div>
+
           </div>
         </div>
       )}
